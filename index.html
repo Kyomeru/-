@@ -135,6 +135,7 @@ const GAMES = [
   { id: 'slot',      name: 'スロット' },
 ];
 const MAX_STAMPS = 5;
+const STAFF_PASSWORD = '1234'; // リセット時に入力させるスタッフ用パスワード。本番前に変更してください
 /* ========================================================= */
 
 const STORAGE_KEY = 'casino_round_v1';
@@ -151,6 +152,12 @@ function saveRound(round) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(round));
 }
 function resetRound() {
+  const input = prompt('スタッフ用パスワードを入力してください');
+  if (input === null) return; // キャンセル
+  if (input !== STAFF_PASSWORD) {
+    alert('パスワードが違います。');
+    return;
+  }
   saveRound({ count: 0 });
   location.href = 'index.html';
 }
@@ -178,8 +185,8 @@ function renderFull() {
     <div class="status-icon">🎊</div>
     <div class="message ok">スタンプカードがいっぱいになりました！</div>
     ${dotsHtml(round.count)}
-    <div class="message" style="color:#9aa3b2;">チップの受付にお進みください。<br>また遊びたい方は、並び直してからこのボタンを押してください。</div>
-    <button class="reset-btn" onclick="resetRound()">🔄 リセットして新しいラウンドへ</button>
+    <div class="message" style="color:#9aa3b2;">チップの受付にお進みください。<br>また遊びたい場合は、並び直してからスタッフの案内でリセットしてもらってください。</div>
+    <button class="reset-btn" onclick="resetRound()">🔄 リセット（スタッフ用）</button>
   `;
   backLink.style.display = 'none';
 }
