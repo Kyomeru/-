@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="dark">
+<title>文化祭カジノ スタンプカード</title>
+<style>
+  :root {
+    --gold: #f4c430;
+    --bg: #10131a;
+    --card: #1b1f2a;
+    --green: #2ecc71;
+    --red: #e74c3c;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Hiragino Sans", "Yu Gothic", sans-serif;
+    background: radial-gradient(circle at top, #1a1f2e, var(--bg));
+    color: #fff;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .wrap { max-width: 420px; width: 100%; }
+  h1 {
+    text-align: center;
+    font-size: 1.4em;
+    color: var(--gold);
+    letter-spacing: 0.05em;
+    margin-bottom: 24px;
+  }
+  .card {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 28px 20px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    border: 1px solid rgba(244,196,48,0.25);
+  }
+  .status-icon { font-size: 3.2em; margin-bottom: 8px; }
+  .game-name { font-size: 1.3em; font-weight: bold; margin: 8px 0 4px; }
+  .message { font-size: 1.05em; margin-top: 6px; line-height: 1.6; }
+  .ok { color: var(--green); }
+  .ng { color: var(--red); }
+  .badge {
+    display: inline-block;
+    margin-top: 14px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 0.85em;
+    font-weight: bold;
+  }
+  .badge.ok { background: rgba(46,204,113,0.15); }
+  .badge.ng { background: rgba(231,76,60,0.15); }
+
+  .list { list-style: none; padding: 0; margin: 0; text-align: left; }
+  .list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 6px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    font-size: 1.05em;
+  }
+  .list li:last-child { border-bottom: none; }
+  .stamp { font-size: 1.3em; }
+
+  .back-link {
+    display: block;
+    text-align: center;
+    margin-top: 22px;
+    color: #9aa3b2;
+    text-decoration: none;
+    font-size: 0.9em;
+  }
+  .back-link:hover { color: var(--gold); }
+
+  .progress-text {
+    text-align: center;
+    margin-bottom: 14px;
+    color: #9aa3b2;
+    font-size: 0.95em;
+  }
+  .dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+  }
+  .dots span {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: inline-block;
+    border: 2px solid var(--gold);
+    background: rgba(255,255,255,0.08);
+  }
+  .dots span.filled { background: var(--gold); }
+
+  .reset-btn {
+    display: inline-block;
+    margin-top: 18px;
+    padding: 12px 22px;
+    border-radius: 999px;
+    border: none;
+    background: var(--gold);
+    color: #10131a;
+    font-weight: bold;
+    font-size: 1em;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🎰 文化祭カジノ スタンプカード</h1>
+  <div class="card" id="app"></div>
+  <a class="back-link" id="backLink" href="index.html" style="display:none;">← スタンプカードを見る</a>
+</div>
+
+<script>
+/* =========================================================
+   ここを文化祭の内容に合わせて編集してください
+   GAMES      : 各ゲーム台のQR用（idはURLに使う英数字、nameは表示名。飾りとしての表示のみで、
+                回数制限には影響しません＝どのゲームも何回読んでもOK）
+   MAX_STAMPS : 1ラウンドで貯められるスタンプの上限。満タンで退場→また並んでね、の上限数
+   ========================================================= */
+const GAMES = [
+  { id: 'baccarat',   name: 'バカラ' },
+  { id: 'highlow',    name: 'ハイアンドロー' },
+  { id: 'blackjack',  name: 'ブラックジャック' },
+  { id: 'dodeka',     name: 'ドデカ抽選機' },
+];
+const MAX_STAMPS = 5;
+const STAFF_PASSWORD = '1234'; // リセット時に入力させるスタッフ用パスワード。本番前に変更してください
+/* ========================================================= */
+
+const STORAGE_KEY = 'casino_round_v1';
+
+function loadRound() {
+  try {
+    const v = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    return (v && typeof v.count === 'number') ? v : { count: 0 };
+  } catch (e) {
+    return { count: 0 };
+  }
+}
+function saveRound(round) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(round));
+}
+function resetRound() {
+  const input = prompt('スタッフ用パスワードを入力してください');
+  if (input === null) return; // キャンセル
+  if (input !== STAFF_PASSWORD) {
+    alert('パスワードが違います。');
+    return;
+  }
+  saveRound({ count: 0 });
+  location.href = 'index.html';
+}
+
+const app = document.getElementById('app');
+const backLink = document.getElementById('backLink');
+
+const params = new URLSearchParams(window.location.search);
+const gameId = params.get('game');
+const game = GAMES.find(g => g.id === gameId);
+
+let round = loadRound();
+
+function dotsHtml(count) {
+  let html = '<div class="dots">';
+  for (let i = 0; i < MAX_STAMPS; i++) {
+    html += `<span class="${i < count ? 'filled' : ''}"></span>`;
+  }
+  html += '</div>';
+  return html;
+}
+
+function renderFull() {
+  app.innerHTML = `
+    <div class="status-icon">🎊</div>
+    <div class="message ok">スタンプカードがいっぱいになりました！</div>
+    ${dotsHtml(round.count)}
+    <div class="message" style="color:#9aa3b2;">チップの受付にお進みください。<br>また遊びたい場合は、並び直してからスタッフの案内でリセットしてもらってください。</div>
+    <button class="reset-btn" onclick="resetRound()">🔄 リセット（スタッフ用）</button>
+  `;
+  backLink.style.display = 'none';
+}
+
+function renderStampGet() {
+  round.count += 1;
+  saveRound(round);
+
+  if (round.count >= MAX_STAMPS) {
+    renderFull();
+    return;
+  }
+
+  app.innerHTML = `
+    <div class="status-icon">🎉</div>
+    ${game ? `<div class="game-name">${game.name}</div>` : ''}
+    <div class="message ok">スタンプGET！</div>
+    ${dotsHtml(round.count)}
+    <div class="progress-text">${round.count} / ${MAX_STAMPS} 個たまりました</div>
+  `;
+  backLink.style.display = 'block';
+}
+
+function renderOverview() {
+  app.innerHTML = `
+    <div class="progress-text" style="margin-top:4px;">現在のスタンプ</div>
+    ${dotsHtml(round.count)}
+    <div class="progress-text">${round.count} / ${MAX_STAMPS} 個たまっています</div>
+    <div class="message" style="margin-top:10px; color:#9aa3b2;">ゲーム台のQRコードを読み込むと、スタンプが増えていきます。</div>
+  `;
+  backLink.style.display = 'none';
+}
+
+if (round.count >= MAX_STAMPS) {
+  renderFull();
+} else if (gameId) {
+  renderStampGet();
+} else {
+  renderOverview();
+}
+</script>
+</body>
+</html>
