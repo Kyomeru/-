@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QRコード印刷用ページ（スタッフ用）</title>
+<style>
+  body {
+    font-family: "Hiragino Sans", "Yu Gothic", sans-serif;
+    background: #f4f4f4;
+    margin: 0;
+    padding: 24px;
+  }
+  h1 { text-align: center; color: #222; }
+  .note {
+    max-width: 600px;
+    margin: 0 auto 24px;
+    background: #fff8e1;
+    border: 1px solid #f4c430;
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 0.9em;
+    color: #555;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  .qr-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 16px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    page-break-inside: avoid;
+  }
+  .qr-card img { width: 180px; height: 180px; }
+  .qr-card h2 { margin: 10px 0 4px; font-size: 1.2em; }
+  .qr-card .url { font-size: 0.75em; color: #888; word-break: break-all; }
+  @media print {
+    .note, button { display: none; }
+  }
+  button {
+    display: block;
+    margin: 0 auto 20px;
+    padding: 10px 20px;
+    font-size: 1em;
+    border: none;
+    border-radius: 8px;
+    background: #f4c430;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+<h1>🎰 ゲーム台用QRコード一覧</h1>
+<div class="note">
+  各カードのQRコードをそのゲーム台に貼ってください。同じフォルダの index.html を編集して GAMES の内容を変えると、ここも自動で更新されます。
+</div>
+<button onclick="window.print()">🖨️ このページを印刷する</button>
+<div class="grid" id="grid"></div>
+
+<script>
+/* index.html の GAMES と同じ内容にしてください */
+const GAMES = [
+  { id: 'roulette',  name: 'ルーレット' },
+  { id: 'blackjack', name: 'ブラックジャック' },
+  { id: 'poker',     name: 'ポーカー' },
+  { id: 'slot',      name: 'スロット' },
+];
+
+// このページと同じ場所にある index.html を基準にURLを作る
+const baseUrl = window.location.href.replace(/admin\.html.*$/, 'index.html');
+
+const grid = document.getElementById('grid');
+for (const g of GAMES) {
+  const url = `${baseUrl}?game=${encodeURIComponent(g.id)}`;
+  const qrImg = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(url)}`;
+  const div = document.createElement('div');
+  div.className = 'qr-card';
+  div.innerHTML = `
+    <img src="${qrImg}" alt="QR: ${g.name}">
+    <h2>${g.name}</h2>
+    <div class="url">${url}</div>
+  `;
+  grid.appendChild(div);
+}
+</script>
+</body>
+</html>
