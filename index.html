@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="color-scheme" content="dark">
-<title>文化祭カジノ スタンプカード</title>
+<title>I科ジノ スタンプカード</title>
 <style>
   :root {
     --gold: #f4c430;
@@ -202,7 +202,7 @@
 </head>
 <body>
 <div class="wrap">
-  <h1>🎰 文化祭カジノ スタンプカード</h1>
+  <h1>🎰 I科ジノ スタンプカード</h1>
   <button class="rules-btn" onclick="showRules()">📜 ルール</button>
   <div class="card" id="app"></div>
   <div id="qr-reader-wrap">
@@ -235,15 +235,13 @@ const GAMES = [
   { id: 'dodeka',     name: 'ドデカ抽選機' },
 ];
 const MAX_STAMPS = 3;
-const STAFF_PASSWORD = '1234'; // リセット時に入力させるスタッフ用パスワード。本番前に変更してください
+const STAFF_PASSWORD = '0912'; // リセット時に入力させるスタッフ用パスワード。本番前に変更してください
 const FORCE_END_PASSWORD = '0912'; // チップ切れなどで途中終了させる時のパスワード
-const RULES_TEXT = `・チップは貸し出し制です。終了時にチップ数でランキングに参加できます。
+const RULES_TEXT = `・チップは貸し出し制です。終了時にチップの価値の合計に応じて景品を交換できます。
 ・1回の来場でスタンプは${MAX_STAMPS}個まで貯められます。
-・同じゲームを何度でも遊べます。
-・スタンプが貯まったら、チップ受付へお進みください。
-・もう一度遊びたい場合は、並び直してください。
-
-ここを編集して、実際のルールに書き換えてください（RULES_TEXT）。`;
+・同じゲームは何度でも遊べます。
+・スタンプが貯まったorチップが全て無くなったら終了となります。入口に入ってすぐ左の景品交換所で交換してください。
+・プレイは一度きりとします。`;
 /* ========================================================= */
 
 const STORAGE_KEY = 'casino_round_v2';
